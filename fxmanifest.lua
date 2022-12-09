@@ -5,4 +5,4 @@ dependencies {
     "/server:5104",
 }
 
-server_script "dist/build.js"
+server_script "build/server.js"

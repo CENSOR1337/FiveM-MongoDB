@@ -21,6 +21,7 @@
     "mongodb": "^4.12.1"
   },
   "devDependencies": {
-    "esbuild": "^0.16.3"
+    "esbuild": "^0.16.3",
+    "fs-extra": "^11.1.0"
   }
 }
