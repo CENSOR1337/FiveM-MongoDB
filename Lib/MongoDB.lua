@@ -4,8 +4,8 @@ local Await = Citizen.Await
 
 local function await(fn, params)
     local p = promise.new()
-    fn(MongoDBObject, params, function(result)
-        p:resolve(result)
+    fn(MongoDBObject, params, function(error, result)
+        p:resolve((not error) and result or nil)
     end)
     return Await(p)
 end

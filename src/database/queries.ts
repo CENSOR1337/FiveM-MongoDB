@@ -2,9 +2,16 @@ import { getCollection } from ".";
 import { InsertOneResult, InsertManyResult, UpdateResult, Document, DeleteResult } from "mongodb";
 import * as utils from "../utils";
 
+async function catchAndThrow(callback: any, error: any) {
+    utils.safeCallback(callback, true);
+    throw new Error(error);
+}
+
 export async function find(params: any, callback: any) {
     params = params || {};
-    if (!params.collection) throw new Error("No collection provided");
+    if (!params.collection) {
+        catchAndThrow(callback, "No collection provided");
+    }
 
     const collection = await getCollection(params.collection);
 
@@ -12,9 +19,9 @@ export async function find(params: any, callback: any) {
     let options = utils.safeObjectArgument(params.options);
 
     collection.find(filter, options).toArray().then((documents: any) => {
-        utils.safeCallback(callback, utils.exportDocuments(documents));
+        utils.safeCallback(callback, false, utils.exportDocuments(documents));
     }).catch((error: any) => {
-        throw new Error(error);
+        catchAndThrow(callback, error);
     });
 }
 
@@ -28,9 +35,9 @@ export async function findOne(params: any, callback: any) {
     let options = utils.safeObjectArgument(params.options);
 
     collection.findOne(filter, options).then((document: any) => {
-        utils.safeCallback(callback, utils.exportDocument(document));
+        utils.safeCallback(callback, false, utils.exportDocument(document));
     }).catch((error: any) => {
-        throw new Error(error);
+        catchAndThrow(callback, error);
     });
 }
 
@@ -47,9 +54,9 @@ export async function insertOne(params: any, callback: any) {
             acknowledged: result.acknowledged,
             insertedId: result.insertedId.toString(),
         }
-        utils.safeCallback(callback, resultObject);
+        utils.safeCallback(callback, false, resultObject);
     }).catch((error: any) => {
-        throw new Error(error);
+        catchAndThrow(callback, error);
     });
 }
 
@@ -71,9 +78,9 @@ export async function insertMany(params: any, callback: any) {
             insertedIds[key] = result.insertedIds[key].toString();
         }
         resultObject.insertedIds = insertedIds;
-        utils.safeCallback(callback, resultObject);
+        utils.safeCallback(callback, false, resultObject);
     }).catch((error: any) => {
-        throw new Error(error);
+        catchAndThrow(callback, error);
     });
 }
 
@@ -96,9 +103,9 @@ async function dbUpdate(one: boolean, params: any, callback: any) {
             upsertedCount: result.upsertedCount,
             upsertedId: result.upsertedId ? result.upsertedId.toString() : null,
         }
-        utils.safeCallback(callback, resultObject);
+        utils.safeCallback(callback, false, resultObject);
     }).catch((error: any) => {
-        throw new Error(error);
+        catchAndThrow(callback, error);
     });
 }
 
@@ -125,9 +132,9 @@ async function dbDelete(one: boolean, params: any, callback: any) {
             acknowledged: result.acknowledged,
             deletedCount: result.deletedCount,
         }
-        utils.safeCallback(callback, resultObject);
+        utils.safeCallback(callback, false, resultObject);
     }).catch((error: any) => {
-        throw new Error(error);
+        catchAndThrow(callback, error);
     });
 }
 
@@ -149,8 +156,8 @@ export async function count(params: any, callback: any) {
     let options = utils.safeObjectArgument(params.options);
 
     collection.countDocuments(filter, options).then((count: number) => {
-        utils.safeCallback(callback, count);
+        utils.safeCallback(callback, false, count);
     }).catch((error: any) => {
-        throw new Error(error);
+        catchAndThrow(callback, error);
     });
 }
