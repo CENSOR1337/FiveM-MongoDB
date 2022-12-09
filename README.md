@@ -12,6 +12,10 @@ set mongodb_database "fivem_db"
 ensure cs_mongodb
 ```
 4. Change `mongodb_url` and `mongodb_database` to your own values.
+5. load moudule in your fxmanifest.lua or __resource.lua file:
+```lua
+server_script "@cs_mongodb/lib/MongoDB.lua",
+```
 
 ## Usage 
 Callback (Lua):
