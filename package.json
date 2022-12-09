@@ -1,0 +1,26 @@
+{
+  "name": "fivem-mongodb",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "node build.js --mode=production",
+    "watch": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CENSOR1337/FiveM-Mongodb.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CENSOR1337/FiveM-Mongodb/issues"
+  },
+  "homepage": "https://github.com/CENSOR1337/FiveM-Mongodb#readme",
+  "dependencies": {
+    "@citizenfx/server": "^2.0.6124-1",
+    "mongodb": "^4.12.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.16.3"
+  }
+}
