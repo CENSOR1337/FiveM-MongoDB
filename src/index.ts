@@ -1,22 +1,16 @@
-import { MongoInstance } from './database/';
+import { find, findOne, insertOne, insertMany, updateOne, updateMany, deleteOne, deleteMany, count } from './database/queries';
 import { ObjectId } from 'mongodb';
-import * as config from './config/';
-
-const mongodbMainInstance = new MongoInstance("main", config.mainInstance.url, config.mainInstance.database, {});
 
 exports("ObjectId", (): string => {
     return new ObjectId().toHexString();
 })
 
-if (mongodbMainInstance) {
-    exports("find", mongodbMainInstance.find);
-
-    mongodbMainInstance.find({
-        collection: "users",
-        query: {},
-        options: {}
-    }, (documents: any) => {
-        console.log(documents);
-    });
-}
-
+exports("find", find);
+exports("findOne", findOne);
+exports("insertOne", insertOne);
+exports("insertMany", insertMany);
+exports("updateOne", updateOne);
+exports("updateMany", updateMany);
+exports("deleteOne", deleteOne);
+exports("deleteMany", deleteMany);
+exports("count", count);

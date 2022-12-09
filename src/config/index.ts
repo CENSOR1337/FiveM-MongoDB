@@ -1,4 +1,2 @@
-export const mainInstance = {
-    url: GetConvar('mongodb_url', 'null'),
-    database: GetConvar('mongodb_database', 'null'),
-}
+export const url = GetConvar('mongodb_url', 'null')
+export const dbName = GetConvar('mongodb_database', 'null')

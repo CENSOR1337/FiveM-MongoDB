@@ -1,68 +1,38 @@
-import { MongoClient, MongoClientOptions, Db } from "mongodb";
-import { safeCallback, safeQuery } from "../utils";
+import { MongoClient, Db } from "mongodb";
+import { url, dbName } from "../config"
 import { logger } from "../logger";
 
-export class MongoInstance {
-    name: string;
-    url: string;
-    dbName: string;
-    options: MongoClientOptions;
-    private client: MongoClient;
-    private db: Db;
+const mongoClient = new MongoClient(url);
+let db: Db;
+let connected: boolean = false;
 
-    constructor(name: string, url: string, dbName: string, options: MongoClientOptions) {
-        if (!name || name === "null") {
-            throw new Error("No name provided");
-        }
-        if (!url || url === "null") {
-            throw new Error("No url provided");
-        }
-        if (!dbName || dbName === "null") {
-            throw new Error("No database name provided");
-        }
-        this.name = name;
-        this.url = url;
-        this.dbName = dbName;
-        this.options = options;
-        this.client = new MongoClient(this.url, options);
-        this.client.connect();
-        this.db = this.client.db(this.dbName);
-        if (this.db) {
-            this.log(`Connected to database "${this.dbName}"`);
-        }
-    }
+mongoClient.connect().then(() => {
+    db = mongoClient.db(dbName);
+    connected = true;
+    logger(`Connected to database "${dbName}"`);
+}).catch((error: any) => {
+    logger(`Error connecting to database "${dbName}": ${error}`, "ERROR");
+});
 
-    log = (message: string, type: string = "INFO") => {
-        logger(`[${this.name}] ${message}`, type);
-    }
 
-    getDbConnection() {
-        if (!this.db) {
-            this.log(`exports.getDbConnection: Error "No database connection".`, "ERROR");
-            return;
-        }
-        return this.db;
+async function waitForConnection() {
+    if (!isConnected()) {
+        await new Promise<void>((resolve) => {
+            (function wait() {
+                if (isConnected()) {
+                    return resolve();
+                } 
+                setTimeout(wait);
+            })();
+        });
     }
+}
 
-    getCollection(collectionName: string) {
-        const db = this.getDbConnection();
-        if (!db) return
-        return db.collection(collectionName);
-    }
+export function isConnected() {
+    return connected;
+}
 
-    async find(params: any, callback: any) {
-        const collection = this.getCollection(params.collection);
-        if (!collection) {
-            throw new Error("No collection provided");
-        }
-        const query = safeQuery(params.query);
-        let result = collection.find(query, params.options);
-        const documents = await result.toArray();
-        safeCallback(callback, documents);
-    }
-
-    closeConnection() {
-        this.client.close();
-        this.log(`Connection to database "${this.dbName}" closed.`);
-    }
+export async function getCollection(collectionName: string) {
+    if (!isConnected()) await waitForConnection();
+    return db.collection(collectionName);
 }
