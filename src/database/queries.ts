@@ -8,10 +8,10 @@ export async function find(params: any, callback: any) {
 
     const collection = await getCollection(params.collection);
 
-    params.query = utils.safeObjectArgument(params.query);
-    params.options = utils.safeObjectArgument(params.options);
+    let filter = utils.safeObjectArgument(params.filter);
+    let options = utils.safeObjectArgument(params.options);
 
-    collection.find(params.query, params.options).toArray().then((documents: any) => {
+    collection.find(filter, options).toArray().then((documents: any) => {
         utils.safeCallback(callback, utils.exportDocuments(documents));
     }).catch((error: any) => {
         throw new Error(error);
@@ -24,10 +24,10 @@ export async function findOne(params: any, callback: any) {
 
     const collection = await getCollection(params.collection);
 
-    params.query = utils.safeObjectArgument(params.query);
-    params.options = utils.safeObjectArgument(params.options);
+    let filter = utils.safeObjectArgument(params.filter);
+    let options = utils.safeObjectArgument(params.options);
 
-    collection.findOne(params.query, params.options).then((document: any) => {
+    collection.findOne(filter, options).then((document: any) => {
         utils.safeCallback(callback, utils.exportDocument(document));
     }).catch((error: any) => {
         throw new Error(error);
@@ -40,9 +40,9 @@ export async function insertOne(params: any, callback: any) {
 
     const collection = await getCollection(params.collection);
 
-    params.document = utils.safeObjectArgument(params.document);
+    let document = utils.safeObjectArgument(params.document);
 
-    collection.insertOne(params.document).then((result: InsertOneResult) => {
+    collection.insertOne(document).then((result: InsertOneResult) => {
         let resultObject = {
             acknowledged: result.acknowledged,
             insertedId: result.insertedId.toString(),
@@ -58,9 +58,9 @@ export async function insertMany(params: any, callback: any) {
     if (!params.collection) throw new Error("No collection provided");
 
     const collection = await getCollection(params.collection);
-    params.documents = utils.safeObjectArgument(params.documents);
+    let documents = utils.safeObjectArgument(params.documents);
 
-    collection.insertMany(params.documents).then((result: InsertManyResult) => {
+    collection.insertMany(documents).then((result: InsertManyResult) => {
         let resultObject = {
             acknowledged: result.acknowledged,
             insertedCount: result.insertedCount,
@@ -83,11 +83,11 @@ async function dbUpdate(one: boolean, params: any, callback: any) {
 
     const collection = await getCollection(params.collection);
 
-    params.query = utils.safeObjectArgument(params.query);
-    params.update = utils.safeObjectArgument(params.update);
-    params.options = utils.safeObjectArgument(params.options);
+    let filter = utils.safeObjectArgument(params.filter);
+    let update = utils.safeObjectArgument(params.update);
+    let options = utils.safeObjectArgument(params.options);
 
-    const promise = one ? collection.updateOne(params.query, params.update, params.options) : collection.updateMany(params.query, params.update, params.options)
+    const promise = one ? collection.updateOne(filter, update, options) : collection.updateMany(filter, update, options)
     promise.then((result: UpdateResult | Document) => {
         let resultObject = {
             acknowledged: result.acknowledged,
@@ -116,10 +116,10 @@ async function dbDelete(one: boolean, params: any, callback: any) {
 
     const collection = await getCollection(params.collection);
 
-    params.filter = utils.safeObjectArgument(params.filter);
-    params.options = utils.safeObjectArgument(params.options);
+    let filter = utils.safeObjectArgument(params.filter);
+    let options = utils.safeObjectArgument(params.options);
 
-    const promise = one ? collection.deleteOne(params.filter, params.options) : collection.deleteMany(params.filter, params.options);
+    const promise = one ? collection.deleteOne(filter, options) : collection.deleteMany(filter, options);
     promise.then((result: DeleteResult) => {
         let resultObject = {
             acknowledged: result.acknowledged,
@@ -145,10 +145,10 @@ export async function count(params: any, callback: any) {
 
     const collection = await getCollection(params.collection);
 
-    params.query = utils.safeObjectArgument(params.query);
-    params.options = utils.safeObjectArgument(params.options);
+    let filter = utils.safeObjectArgument(params.filter);
+    let options = utils.safeObjectArgument(params.options);
 
-    collection.countDocuments(params.query, params.options).then((count: number) => {
+    collection.countDocuments(filter, options).then((count: number) => {
         utils.safeCallback(callback, count);
     }).catch((error: any) => {
         throw new Error(error);
